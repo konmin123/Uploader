@@ -4,6 +4,7 @@ from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from files.models import File
 from .serializers import FileSerializer
+from .tasks import task
 
 
 class UploadViewSet(mixins.CreateModelMixin, GenericViewSet):
@@ -12,8 +13,8 @@ class UploadViewSet(mixins.CreateModelMixin, GenericViewSet):
     http_method_names = ['post']
 
     def perform_create(self, serializer):
-        # запуск ассинхронной задачи обработки через celary
-        serializer.save()
+        obj = serializer.save()
+        task(obj)
 
 
 class FileViewSet(ReadOnlyModelViewSet):
